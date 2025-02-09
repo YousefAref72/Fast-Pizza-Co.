@@ -41,31 +41,47 @@ function CreateOrder() {
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
   return (
-    <div>
-      <h2>Ready to order? Let us go!</h2>
+    <div className="px-4 py-6">
+      <h2 className="mb-8 text-xl font-semibold">Ready to order? Let us go!</h2>
 
-      <Form method="POST">
-        <div>
-          <label>First Name</label>
-          <input className="input" type="text" name="customer" required />
+      <Form method="POST" className="space-y-4">
+        <div className="flex items-center justify-between">
+          <label className="basis-40">First Name</label>
+          <input className="input grow" type="text" name="customer" required />
         </div>
 
-        <div>
-          <label>Phone number</label>
-          <div>
-            <input className="input" type="tel" name="phone" required />
+        <div className="flex items-center ">
+          <label className="basis-40">Phone number</label>
+          <div className="grow">
+            <input
+              className="input w-full  "
+              type="tel"
+              name="phone"
+              required
+            />
+            {errors && errors.phone ? (
+              <p className="text-red-500 bg-red-300 rounded-md px-3 mt-3 py-0.5">
+                {errors.phone}
+              </p>
+            ) : (
+              ""
+            )}
           </div>
-          {errors && errors.phone ? <p>{errors.phone}</p> : ""}
         </div>
 
-        <div>
-          <label>Address</label>
-          <div>
-            <input className="input" type="text" name="address" required />
+        <div className="flex items-center">
+          <label className="basis-40">Address</label>
+          <div className="grow">
+            <input
+              className="input w-full"
+              type="text"
+              name="address"
+              required
+            />
           </div>
         </div>
 
-        <div>
+        <div className="pb-7 flex items-center space-x-4">
           <input
             type="checkbox"
             name="priority"
@@ -75,12 +91,14 @@ function CreateOrder() {
             className="h-6 w-6 accent-yellow-400 focus:ring focus:ring-yellow-300 focus:outline-none
             focus: ring-offset-2"
           />
-          <label htmlFor="priority">Want to yo give your order priority?</label>
+          <label className=" font-medium" htmlFor="priority">
+            Want to yo give your order priority?
+          </label>
         </div>
 
         <div>
           <input type="hidden" name="cart" value={JSON.stringify(cart)} />
-          <Button disabled={isSubmitting}>
+          <Button type="primary" disabled={isSubmitting}>
             {isSubmitting ? "Ordering..." : "Order now"}
           </Button>
         </div>
@@ -100,11 +118,11 @@ export async function action({ request }) {
     cart: JSON.parse(data.cart),
     priority: data.priority === "on",
   };
-  // const errors = {};
-  // if (!isValidPhone(order.phone))
-  //   errors.phone = "Please provide a valid phone number!";
+  const errors = {};
+  if (!isValidPhone(order.phone))
+    errors.phone = "Please provide a valid phone number!";
 
-  // if (Object.keys(errors).length > 0) return errors;
+  if (Object.keys(errors).length > 0) return errors;
 
   // const newOrder = await createOrder(order);
 
