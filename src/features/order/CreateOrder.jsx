@@ -1,6 +1,9 @@
 import { Form, redirect, useActionData, useNavigation } from "react-router-dom";
 import { createOrder } from "../../services/apiRestaurant";
 import Button from "../../ui/Button";
+import { useSelector } from "react-redux";
+import { clearCart, getCart } from "../cart/cartSlice";
+import store from "../../store";
 
 // https://uibakery.io/regex-library/phone-number
 const isValidPhone = (str) =>
@@ -34,12 +37,14 @@ const fakeCart = [
 
 function CreateOrder() {
   // const [withPriority, setWithPriority] = useState(false);
-  const cart = fakeCart;
+  const cart = useSelector(getCart);
   //  give us returned data in case theres no submition
+
   const errors = useActionData();
 
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
+  const user = useSelector((store) => store.user);
   return (
     <div className="px-4 py-6">
       <h2 className="mb-8 text-xl font-semibold">Ready to order? Let us go!</h2>
@@ -47,7 +52,13 @@ function CreateOrder() {
       <Form method="POST" className="space-y-4">
         <div className="flex items-center justify-between">
           <label className="basis-40">First Name</label>
-          <input className="input grow" type="text" name="customer" required />
+          <input
+            className="input grow"
+            type="text"
+            defaultValue={user.username}
+            name="customer"
+            required
+          />
         </div>
 
         <div className="flex items-center ">
@@ -124,10 +135,13 @@ export async function action({ request }) {
 
   if (Object.keys(errors).length > 0) return errors;
 
-  // const newOrder = await createOrder(order);
+  const newOrder = await createOrder(order);
 
-  // return redirect(`/order/${newOrder.id}`);
-  return null;
+  // hacky way, don't overuse it
+  store.dispatch(clearCart());
+
+  return redirect(`/order/${newOrder.id}`);
+  // return null;
 }
 
 export default CreateOrder;
